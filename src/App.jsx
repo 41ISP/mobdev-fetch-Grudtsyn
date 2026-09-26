@@ -1,7 +1,7 @@
 import Layout from './components/Layout'
 import Main from './pages/Main'
 import Search from './pages/Search'
-import Book from './pages/Books'
+import Book from './pages/Book'
 import { Route, Routes } from 'react-router-dom'
 
 
