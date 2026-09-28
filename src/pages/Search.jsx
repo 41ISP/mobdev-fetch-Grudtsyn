@@ -1,27 +1,49 @@
-import { useState, useEffect } from "react"
-import { useNavigate ,useSearchParams } from "react-router-dom"
-import BookCard from '../components/BookCard'
+import { useEffect, useState } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
+import BookCard from "../components/BookCard"
+import Loader from "../components/Loader"
+
 const Search = () => {
-    const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-    const queryParam = searchParams.get("q") || ""
+    const navigate = useNavigate()
+    const queryParam = searchParams.get('q') || ''
     const [textField, setTextField] = useState(queryParam)
     const [books, setBooks] = useState([])
+    const [error, setError] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
+
     useEffect(() => {
-    const loadBooks = async () => {
-        const res = await fetch(
-        'https://openlibrary.org/search.json' + "?q=" + queryParam + "&limit=20",
-        )
-        const data = await res.json()
-        console.log(data)
-        setBooks(data.docs)
-    }
-    loadBooks()
+        const loadBooks = async () => {
+            try {
+                setIsLoading(true)
+                setError(null)
+                const res = await fetch(
+
+                    "https://openlibrary.org/search.json" + '?q=' + queryParam + '&limit=20',
+                )
+                if (!res.ok) {
+                    const errorData = await res.json()
+
+                    throw new Error(errorData.detail[0].msg || "Something is wrong")
+                }
+                console.log(res)
+                const data = await res.json()
+                setBooks(data.docs)
+            } catch (error) {
+                console.error(error)
+                setError(error.message)
+            } finally {
+                setIsLoading(false)
+            }
+
+        }
+        loadBooks()
     }, [queryParam])
-    
+
+
     const handleSubmit = (e) => {
         e.preventDefault()
-        if(textField.trim() === "") return
+        if (textField.trim() === '') return
         navigate('/search?q=' + encodeURIComponent(textField.trim()))
     }
     return (
@@ -50,11 +72,15 @@ const Search = () => {
                     —
                 </span>
             </div>
-            <div className="book-grid" id="results">
-                {books.map((e) => (
-                <BookCard {...e}/>
-                ))}
-            </div>
+            {isLoading && <Loader />}
+            {!isLoading && error && (<p>{error}</p>)}
+            {!isLoading && !error && (<div className="book-grid" id="results">
+                {books.map((e) => {
+                    const { key, ...props } = e
+                    return <BookCard {...props} bookKey={e.key}
+                        key={e.key} />
+                })}
+            </div>)}
         </section>
     )
 }
