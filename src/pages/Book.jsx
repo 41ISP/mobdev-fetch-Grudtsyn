@@ -30,9 +30,9 @@ const Book = () => {
 
                     data.author = authorData.name
                 }
-                if (data.genres[0].key) {
+                if (data.genres && data.genres[0]) {
                     const genreRes = await fetch(
-                        "https://openlibrary.org" + data.genres[0].key + ".json",
+                        "https://openlibrary.org" + data.genres[0] + ".json",
                     )
                     const genreData = await genreRes.json()
 
