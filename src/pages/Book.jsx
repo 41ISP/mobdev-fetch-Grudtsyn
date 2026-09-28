@@ -29,7 +29,7 @@ const Book = () => {
                     const authorData = await authorRes.json()
 
                     data.author = authorData.name
-                }/*
+                }
                 if (data.genres[0].key) {
                     const genreRes = await fetch(
                         "https://openlibrary.org" + data.genres[0].key + ".json",
@@ -37,7 +37,7 @@ const Book = () => {
                     const genreData = await genreRes.json()
 
                     data.genre = genreData.name
-                }*/
+                }
                 setBook(data)
             } catch (error) {
                 console.error(error)
@@ -67,13 +67,16 @@ const Book = () => {
                 </div>
                 <div className="book-meta">
                     <span id="bookYear">{book.first_publish_date}</span>
-                    <span></span>
+                    <span>{book.genre}</span>
                 </div>
-
                 <div className="description">
                     <h3>Об этой книге</h3>
                     <p id="bookDescription">
-                        {book.description}
+                        {
+                            typeof book.description === 'object'
+                                ? book.description.value
+                                : book.description
+                        }
                     </p>
                 </div>
 
